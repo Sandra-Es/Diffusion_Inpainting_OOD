@@ -18,6 +18,7 @@ def parse_args():
     parser.add_argument("--gt_img_dir", type=str, required=True)
     parser.add_argument("--gt_segm_dir", type=str, required=True)
     parser.add_argument("--save_dir", type=str, required=True)
+    parser.add_argument("--n_sample", type=int, default=500)
 
     args = parser.parse_args()
     return args
@@ -129,6 +130,12 @@ def save_masks_occlussion(imgs_list: List,
         os.makedirs(curr_save_dir, exist_ok=True)
 
         for img_name in tqdm(imgs_list):
+
+            #If exists, skip
+            save_path = os.path.join(curr_save_dir, img_name.replace(".jpg", ".png"))
+            if os.path.exists(save_path): 
+                continue
+
             #Get segmentation masks
             img_id = img_name.split(".")[0]
             segm_masks = extract_segm_masks(img_id, gt_mask_dir)
@@ -137,7 +144,6 @@ def save_masks_occlussion(imgs_list: List,
             bbox_mask = conv_to_bbox(segm_masks["nose"], active_percent=mask_perc)
 
             #Save mask
-            save_path = os.path.join(curr_save_dir, img_name.replace(".jpg", ".png"))
             cv2.imwrite(save_path, bbox_mask * 255)
 
     print(f"\n\n ---- Done Generating Masks : Occlusion ---- \n\n")
@@ -155,12 +161,17 @@ def save_gt_blur(imgs_list: List,
         os.makedirs(blur_img_dir_k, exist_ok=True)
 
         for img_name in tqdm(imgs_list):
+
+            #If exists, skip
+            save_path = os.path.join(blur_img_dir_k, img_name)
+            if os.path.exists(save_path): 
+                continue
+        
             img = cv2.imread(os.path.join(gt_img_dir, img_name))
             img_trim = cv2.resize(img, (512, 512))
 
             img_blur = cv2.GaussianBlur(img_trim, (k, k), 0)
 
-            save_path = os.path.join(blur_img_dir_k, img_name)
             cv2.imwrite(save_path, img_blur)
 
     print(f"\n\n ---- Done Generating GT : Blur ---- \n\n")
@@ -213,7 +224,7 @@ def save_gt_masks_sem_shuffle(imgs_list: List,
                                 ):
 
     parts_swap = [["r_eye", "mouth"]]
-    parts_name = ["_".join(parts_swap)]
+    parts_name = ["_".join(l) for l in parts_swap]
 
     #Create save dirs if not exist
     os.makedirs(save_gt_dir, exist_ok=True)
@@ -233,7 +244,7 @@ def save_gt_masks_sem_shuffle(imgs_list: List,
             img_path = os.path.join(gt_img_dir, img_name)
             img = cv2.imread(img_path)
 
-            segm_masks = extract_segm_masks(img_name.replace(".jpg", ""), mask_dir)
+            segm_masks = extract_segm_masks(img_name.replace(".jpg", ""), gt_mask_dir)
 
             img_trim = cv2.resize(img, (512, 512))
 
@@ -259,35 +270,38 @@ def save_gt_masks_sem_shuffle(imgs_list: List,
                 os.makedirs(os.path.dirname(save_path), exist_ok=True)
                 cv2.imwrite(save_path, bbox_mask * 255)
 
-
+    print(f"\n\n ---- Done Generating GT and Masks : Semantic Shuffle ---- \n\n")
 
 def main():
 
-    args = parser_args()
+    args = parse_args()
 
     #Create save dir
     os.makedirs(args.save_dir, exist_ok=True)
 
     #Get list of 500 images if exists
-    imgs_list_path = os.path.join(args.save_dir, "images-500.txt")
+    imgs_list_path = os.path.join(args.save_dir, f"images-{args.n_sample}.txt")
     if os.path.exists(imgs_list_path):
         imgs_list = open_txt(imgs_list_path)
     else:
-        img_samples = random.sample(os.listdir(args.gt_img_dir, 500))
-        write_txt(img_samples, imgs_list_path)
+        imgs_list = random.sample(os.listdir(args.gt_img_dir), args.n_sample)
+        write_txt(imgs_list, imgs_list_path)
 
     
     #Save Maks : Occlusion
     save_masks_occlussion(imgs_list = imgs_list, 
+                            gt_mask_dir = args.gt_segm_dir,
                             save_mask_dir = os.path.join(args.save_dir, "masks", "square"))
 
     #Save GT : Blur
     save_gt_blur(imgs_list = imgs_list,
+                    gt_img_dir = args.gt_img_dir,
                     save_gt_dir = os.path.join(args.save_dir, "images", "blur"))
 
 
     #Save Masks : Semantic
     save_masks_sem(imgs_list = imgs_list,
+                    gt_mask_dir = args.gt_segm_dir,
                     save_mask_dir = os.path.join(args.save_dir, "masks", "semantic"))
 
 
