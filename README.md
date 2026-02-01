@@ -24,7 +24,11 @@ The results show that **generally-trained diffusion-based models exhibit greater
 
 For a deeper insight into the methodology and results, please refer to the report provided in `docs/ComputerVision_SandraElsaSanjai.pdf`.
 
-![Stable Diffusion Sample Result](./docs/stable_d.png "Sample Results")
+<!-- ![Stable Diffusion Sample Result](./docs/stable_d.png "Sample Results") -->
+
+<p align="center">
+  <img src="./docs/stable_d.png" alt="Sample Result from Stable Diffusion">
+</p>
 
 
 
