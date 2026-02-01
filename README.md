@@ -17,7 +17,7 @@ Specifically, I test out four corruption operations:
 - **Semantic Masking**: To compare semantic priors of the different models. This operator masks specific semantic regions (mouth, nose, etc). 
 
 
-- **Semantic Shuffling**: To test the reliance on learned priors vs local visual information. This operator inserts semantically incompatible facial components into fixed spatial locations, like the mouth region onto the left eye region.
+- **Semantic Shuffling (novel!)**: To test the reliance on learned priors vs local visual information. This operator inserts semantically incompatible facial components into fixed spatial locations, like the mouth region onto the left eye region. Since this is a novel test, **I introduce a quantitative measure** to test the threshold at which the reliance on learned priors are taken over by the local visual information. For more info, please refer to the report. 
 
 
 The results show that **generally-trained diffusion-based models exhibit greater robustness** to semantic and severity inconsistencies than classical approaches, highlighting the limitations of standard inpainting evaluations and motivating semantically grounded robustness benchmarks.
