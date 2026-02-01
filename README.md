@@ -5,9 +5,27 @@
 Computer Vision project on testing the robustness of SoTA inpainting models in out-of-distribution samples
 
 
-Image inpainting models are typically evaluated under in-distribution corruption settings, providing limited insight into their robustness under semantic distribution shift. In this work, I study out-of-distribution robustness in image inpainting through controlled perturbations that progressively increase spatial severity and semantic inconsistency. 
+Image inpainting models are typically evaluated under in-distribution corruptions, offering limited insight into robustness under semantic distribution shift. This work studies out-of-distribution inpainting robustness using controlled perturbations that progressively increase spatial severity and semantic inconsistency.
 
-In addition to standard variations in mask size, blur, and semantic masking, I introduce a **semantic shuffling** experiment that inserts semantically incompatible facial components into fixed spatial locations. I propose a quantitative boundary measure based on LPIPS perceptual similarity to capture the trade-off between learned priors and local visual evidence. The results show that diffusion-based models exhibit greater robustness to semantic inconsistencies than classical approaches, highlighting the limitations of standard inpainting evaluations and motivating semantically grounded robustness benchmarks.
+Specifically, I test out four corruption operations:
+
+- **Varying mask size**: To evaluate sensitivity to increasing occlusion (loss of spatial cues). The operator progressively increases the occlusion mask centered on the nose.
+
+
+- **Varying blur kernel size**: To test robustness to degradation in ground truth. The operator applies an increasing gaussian blur kernel to the ground truth.
+
+- **Semantic Masking**: To compare semantic priors of the different models. This operator masks specific semantic regions (mouth, nose, etc). 
+
+
+- **Semantic Shuffling**: To test the reliance on learned priors vs local visual information. This operator inserts semantically incompatible facial components into fixed spatial locations, like the mouth region onto the left eye region.
+
+
+The results show that **generally-trained diffusion-based models exhibit greater robustness** to semantic and severity inconsistencies than classical approaches, highlighting the limitations of standard inpainting evaluations and motivating semantically grounded robustness benchmarks.
+
+For a deeper insight into the methodology and results, please refer to the report provided in `docs/ComputerVision_SandraElsaSanjai.pdf`.
+
+![Alt text](docs/stable_d.png "Optional title")
+
 
 
 
